@@ -11,6 +11,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import br.com.alura.gerenciador.Usuario;
 
@@ -27,28 +28,20 @@ public class FiltroDeAuditoria implements Filter {
 			throws IOException, ServletException {
 
 		HttpServletRequest req = (HttpServletRequest) request;
-		String uri = req.getRequestURI();
-		String usuario = getUsuario(req);
+		
+		String  uri = req.getRequestURI();
+	    String  usuario = getUsuario(req);
 
-		System.out.println("Usuario" + usuario + "acessando a : " +uri );
+	  
 
-		chain.doFilter(request, response);
+	    System.out.println("Usuario " + usuario + " acessando a URI "+ uri);
+	    chain.doFilter(request, response);
 	}
 
-	private String getUsuario(HttpServletRequest req) {
-		Cookie[] cookies = req.getCookies();
-		String usuario = "<Deslogado>";
-
-		if (cookies != null)
-			return usuario;
-
-		for (Cookie cookie : cookies) {
-			if (cookie.getName().equals("usuario.logado")) {
-				usuario = cookie.getValue();
-			}
-		}
-		
-		return usuario;
+	private String getUsuario(HttpServletRequest req){
+		Usuario usuario = (Usuario) req.getSession().getAttribute("usuarioLogado");
+		if(usuario == null) return "<deslogado>";
+		return usuario.getEmail();
 	}
 
 	@Override
